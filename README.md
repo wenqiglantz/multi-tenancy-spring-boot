@@ -1,14 +1,17 @@
 # Customer Service
 
-### Customer Service, provides APIs for customer CRUD service.
+### Customer Service, provides APIs for customer CRUD service, with multi-tenancy support, implemented with Spring Boot, Liquibase, and PostgreSQL.  For detailed article on how this microservice is implemented with multi-tenancy support, please check out my Medium story, link to come.
 
 * **A. Prerequisites**
     *
         1. Windows/Linux based operating system
+        
     *
         2. Java 17
+        
     *
-        3. Database has been created or assuming using an in-memory database for testing purpose.
+        3. Database has been created or assuming using an in-memory database for testing purpose
+        
 
 
 * **B. Getting Started & Run the Application**
