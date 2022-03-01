@@ -1,8 +1,9 @@
 # Customer Service
 
-### Customer Service, provides APIs for customer CRUD service, with multi-tenancy support, implemented with Spring Boot, Liquibase, and PostgreSQL.  For detailed article on how this microservice is implemented with multi-tenancy support, please check out my Medium story, link to come.
+#### Customer Service, provides APIs for customer CRUD service, with multi-tenancy support, implemented with Spring Boot, Liquibase, and PostgreSQL.  For detailed article on how this microservice is implemented with multi-tenancy support, please check out my Medium story, link to come.
 
 * **A. Prerequisites**
+
     *
         1. Windows/Linux based operating system
         
@@ -15,6 +16,7 @@
 
 
 * **B. Getting Started & Run the Application**
+
     *
         1. Clone the git repo in to your local directory from github repository
 
