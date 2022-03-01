@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="add_cs_user_privileges" author="wenqi.glantz">
+        <sql dbms="postgresql" splitStatements="true">
+            CREATE USER ${user_name} WITH PASSWORD '${password}';
+            GRANT CONNECT ON DATABASE ${database} TO ${user_name};
+            ALTER DEFAULT PRIVILEGES IN SCHEMA ${schema} GRANT SELECT, INSERT, UPDATE, DELETE, REFERENCES
+            ON TABLES TO ${user_name};
+            ALTER DEFAULT PRIVILEGES IN SCHEMA ${schema} GRANT USAGE ON SEQUENCES TO ${user_name};
+            ALTER DEFAULT PRIVILEGES IN SCHEMA ${schema} GRANT EXECUTE ON FUNCTIONS TO ${user_name};
+        </sql>
+    </changeSet>
+
+    <changeSet id="grant_permission_to_cs_user" author="wenqi.glantz">
+        <sql dbms="postgresql" splitStatements="true">
+            REVOKE ALL
+            ON ALL TABLES IN SCHEMA ${schema}
+            FROM ${schema};
+
+            GRANT SELECT, INSERT, UPDATE, DELETE
+            ON ALL TABLES IN SCHEMA ${schema}
+            TO ${user_name};
+        </sql>
+    </changeSet>
+
+    <changeSet id="create-customer-table" author="wenqi.glantz">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="CUSTOMER"/>
+            </not>
+        </preConditions>
+        <createTable tableName="CUSTOMER">
+            <column name="ID" type="varchar2(36)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="bigint"/>
+            <column name="CUSTOMER_ID" type="varchar2(36)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="FIRST_NAME" type="varchar2(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="LAST_NAME" type="varchar2(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ADDRESS" type="varchar2(200)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="INSERTED_AT" type="timestamp(6)"/>
+            <column name="INSERTED_BY" type="varchar2(255)"/>
+            <column name="UPDATED_AT" type="timestamp(6)"/>
+            <column name="UPDATED_BY" type="varchar2(255)"/>
+        </createTable>
+        <addUniqueConstraint tableName="CUSTOMER" constraintName="UDX_CUSTOMER"
+                             columnNames="CUSTOMER_ID"/>
+    </changeSet>
+
+    <changeSet id="add-tenant-id-to-CUSTOMER-table" author="wenqi.glantz">
+        <addColumn tableName="CUSTOMER">
+            <column name="TENANT_ID" type="VARCHAR(30)" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="CUSTOMER_row_level_security" author="wenqi.glantz">
+        <sql dbms="postgresql" splitStatements="true">
+            ALTER TABLE CUSTOMER ENABLE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS CUSTOMER_tenant_isolation_policy ON CUSTOMER;
+            CREATE POLICY CUSTOMER_tenant_isolation_policy ON CUSTOMER
+            USING (tenant_id = current_setting('app.tenant_id')::VARCHAR);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

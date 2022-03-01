@@ -1,0 +1,87 @@
+server:
+  port: 8500
+  servlet:
+    context-path: /
+
+logging:
+  level:
+    io.dapr: DEBUG
+
+# Spring
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jackson:
+    default-property-inclusion: NON_NULL
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+  liquibase:
+    enabled: true
+    changeLog: classpath:/db/changelog/db.changelog-master.xml
+    parameters:
+      database: customerservice
+      schema: public
+      user_name: customerservice
+      password: secret
+
+multitenancy:
+  master:
+    datasource:
+      ### In memory H2 connection string
+      #jdbc-url: jdbc:h2:mem:customerservice;Mode=postgreSQL
+      #username: sa
+      # It needs to be empty for h2 (enter sa into h2-console)
+      #password: # It needs to be empty for h2
+      #type: # It needs to be empty for h2
+      #driver-class-name: org.h2.Driver #it has to be populated to avoid "Failed to load driver in either of HikariConfig class loader or Thread context classloader" error
+      ### PostgreSQL
+      url: jdbc:postgresql://localhost:5432/customerservice
+      username: postgres
+      password: postgres
+      tlsEnabled: true
+      minimum-idle: 10 # The minimum number of established connections that should be kept in the pool at all times.
+      maximum-pool-size: 50 # The maximum number of connections that should be kept in the pool at all times.
+      idle-timeout: 30000 # The maximum amount of time in milliseconds that a connection is allowed to sit idle in connection pool
+      max-lifetime: 60000 # The maximum lifetime of a connection in the pool
+  tenant:
+    datasource:
+      url: ${multitenancy.master.datasource.url}
+      username: customerservice
+      password: secret
+      tlsEnabled: true
+      minimum-idle: 10 # The minimum number of established connections that should be kept in the pool at all times.
+      maximum-pool-size: 50 # The maximum number of connections that should be kept in the pool at all times.
+      idle-timeout: 30000 # The maximum amount of time in milliseconds that a connection is allowed to sit idle in connection pool
+      max-lifetime: 60000 # The maximum lifetime of a connection in the pool
+
+management:
+  endpoints:
+    web:
+      base-path: /monitoring
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: 'ALWAYS'
+  health:
+    circuitbreakers:
+      enabled: true
+
+---
+# need this block for local build even though some params can be left empty
+global:
+  datasource:
+    truststore:
+      location: /tmp/postgre.jks #fake placeholder value to avoid local build error
+      password:
+      content:
+      type: JKS
