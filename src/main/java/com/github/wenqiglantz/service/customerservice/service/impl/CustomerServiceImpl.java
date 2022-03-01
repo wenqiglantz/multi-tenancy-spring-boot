@@ -30,6 +30,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .customerId(customerVO.getCustomerId())
                 .firstName(customerVO.getFirstName())
                 .lastName(customerVO.getLastName())
+                .address(customerVO.getAddress())
                 .build();
         customerRepository.save(customer);
         return customerVO;

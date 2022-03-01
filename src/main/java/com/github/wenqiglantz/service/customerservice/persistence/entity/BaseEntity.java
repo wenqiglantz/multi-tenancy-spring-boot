@@ -1,5 +1,6 @@
 package com.github.wenqiglantz.service.customerservice.persistence.entity;
 
+import com.github.wenqiglantz.service.customerservice.config.multitenancy.TenantAware;
 import com.github.wenqiglantz.service.customerservice.config.multitenancy.TenantListener;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ import static java.time.LocalDateTime.now;
 @NoArgsConstructor
 @MappedSuperclass
 @EntityListeners(TenantListener.class)
-public abstract class BaseEntity implements Serializable {
+public abstract class BaseEntity implements TenantAware, Serializable {
 
     @Column(name = "TENANT_ID")
     private String tenantId;

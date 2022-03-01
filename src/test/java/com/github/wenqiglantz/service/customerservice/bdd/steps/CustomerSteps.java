@@ -5,7 +5,6 @@ import com.github.wenqiglantz.service.customerservice.config.multitenancy.Tenant
 import com.github.wenqiglantz.service.customerservice.data.CustomerVO;
 import com.github.wenqiglantz.service.customerservice.persistence.entity.Customer;
 import com.github.wenqiglantz.service.customerservice.persistence.repository.CustomerRepository;
-import io.cucumber.datatable.DataTable;
 import io.cucumber.java.After;
 import io.cucumber.java.AfterStep;
 import io.cucumber.java.Before;
@@ -15,15 +14,15 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
 public class CustomerSteps extends CucumberBootstrap {
@@ -35,6 +34,9 @@ public class CustomerSteps extends CucumberBootstrap {
     @After
     public void cleanUp() {
         log.info(">>> cleaning up after scenario!");
+        TenantContext.setTenantId("1");
+        customerRepository.deleteAll();
+        TenantContext.setTenantId("2");
         customerRepository.deleteAll();
     }
 
@@ -61,18 +63,25 @@ public class CustomerSteps extends CucumberBootstrap {
 
     @Given("^two customer records are persisted in db$")
     public void two_customer_records_persisted() {
-        TenantContext.setTenantId("1");
-        Customer customer1 = Customer.builder()
+        CustomerVO customer1 = CustomerVO.builder()
                 .firstName("first1")
                 .lastName("last1")
+                .address("address1")
                 .build();
-        customerRepository.save(customer1);
-        TenantContext.setTenantId("2");
-        Customer customer2 = Customer.builder()
+        ResponseEntity<CustomerVO> response = testRestTemplate.postForEntity(
+                "/customers", new HttpEntity<>(customer1, getHeadersTenant("1")),
+                CustomerVO.class);
+        assertThat(response.getStatusCode(), is(equalTo(HttpStatus.CREATED)));
+
+        CustomerVO customer2 = CustomerVO.builder()
                 .firstName("first2")
                 .lastName("last2")
+                .address("address2")
                 .build();
-        customerRepository.save(customer2);
+        ResponseEntity<CustomerVO> response2 = testRestTemplate.postForEntity(
+                "/customers", new HttpEntity<>(customer2, getHeadersTenant("2")),
+                CustomerVO.class);
+        assertThat(response2.getStatusCode(), is(equalTo(HttpStatus.CREATED)));
     }
 
     @When("^the user retrieves all records by passing tenantId (.+)$")
@@ -81,7 +90,6 @@ public class CustomerSteps extends CucumberBootstrap {
         List<Customer> customerList = customerRepository.findAll();
         assertThat(customerList.size(), is(equalTo(1)));
         assertThat(customerList.get(0).getFirstName(), is(equalTo("first" + tenantId)));
-        TenantContext.clear();
     }
 
     @Then("^Only 1 record for tenantId (.+) is returned successfully$")
@@ -90,43 +98,5 @@ public class CustomerSteps extends CucumberBootstrap {
         List<Customer> customerList = customerRepository.findAll();
         assertThat(customerList.size(), is(equalTo(1)));
         assertThat(customerList.get(0).getFirstName(), is(equalTo("first" + tenantId)));
-        TenantContext.clear();
-    }
-
-    @Given("^the collection of customers:$")
-    public void collection_of_customers(DataTable dataTable) {
-        dataTable.asList(CustomerVO.class).forEach(customerInfo -> {
-            saveCustomer((CustomerVO) customerInfo);
-        });
-    }
-
-    @When("^customerId (.+) is passed in to retrieve the customer details$")
-    public void get_customer_details_by_id(String customerId) {
-        ResponseEntity<CustomerVO> response = testRestTemplate.getForEntity(
-                "/customers/" + customerId, CustomerVO.class, customerId);
-        assertThat(response.getBody(), is(notNullValue()));
-        assertThat(response.getBody().getCustomerId(), is(equalTo(customerId)));
-    }
-
-    @Then("^The customer detail is retrieved$")
-    public void customer_detail_retrieved(DataTable dataTable) {
-        dataTable.asList(CustomerVO.class).forEach(customerInfo -> {
-            Optional<Customer> customerOptional =
-                    customerRepository.findByCustomerId(((CustomerVO) customerInfo).getCustomerId());
-            if (customerOptional.isPresent()) {
-                assertThat(customerOptional.get().getFirstName(),
-                        is(equalTo(((CustomerVO) customerInfo).getFirstName())));
-                assertThat(customerOptional.get().getLastName(),
-                        is(equalTo(((CustomerVO) customerInfo).getLastName())));
-            }
-        });
-    }
-
-    private void saveCustomer(CustomerVO customerInfo) {
-        customerRepository.save(Customer.builder()
-                .customerId(customerInfo.getCustomerId())
-                .firstName(customerInfo.getFirstName())
-                .lastName(customerInfo.getLastName())
-                .build());
     }
 }
