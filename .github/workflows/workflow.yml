@@ -79,7 +79,7 @@ jobs:
           #This action has a built-in functionality for caching dependencies by using actions/cache under the hood.
           cache: maven
 
-      # run maven command to build the artifact
+      # run maven command to build the artifact, skipping test because no connectivity to a real postgres db in the backend, revise data source jdbc url in application.yml to enable testing 
       - name: Build with Maven
         run: mvn clean install -Dmaven.test.skip --file pom.xml
 
