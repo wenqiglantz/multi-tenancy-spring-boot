@@ -24,7 +24,7 @@
         <springdoc-openapi.version>1.6.5</springdoc-openapi.version>
         <lombok.version>1.18.22</lombok.version>
         <commons-codec.version>1.15</commons-codec.version>
-        <cucumber.version>6.11.0</cucumber.version>
+        <cucumber.version>7.3.4</cucumber.version>
 
         <maven.compiler.version>3.9.0</maven.compiler.version>
         <maven.surefire.version>2.22.2</maven.surefire.version>
