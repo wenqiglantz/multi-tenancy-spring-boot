@@ -81,7 +81,7 @@ jobs:
 
       # run maven command to build the artifact
       - name: Build with Maven
-        run: mvn -B package --file pom.xml
+        run: mvn clean install -Dmaven.test.skip --file pom.xml
 
       # The output of one job is not automatically available to the subsequent jobs in a workflow.
       # GitHub Actions Artifacts allow us to persist data after a job has completed, and share that data with another job in the same workflow.
