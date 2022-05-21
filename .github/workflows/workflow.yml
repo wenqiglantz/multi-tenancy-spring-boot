@@ -106,9 +106,9 @@ jobs:
           # this path and file name is app specific, be sure to modify if your app differs
           path: target/customerservice-0.0.1-SNAPSHOT-exec.jar
           
-      - name: test to see if harden-runner blocks this URL
-        run: |
-          curl -X GET https://www.google.com/ 
+      #- name: test to see if harden-runner blocks this URL
+      #  run: |
+      #    curl -X GET https://www.google.com/ 
 
   autoMerge:
     name: Auto Merge for Dependabot PRs
