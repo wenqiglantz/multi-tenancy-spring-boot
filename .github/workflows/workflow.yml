@@ -106,9 +106,8 @@ jobs:
           # this path and file name is app specific, be sure to modify if your app differs
           path: target/customerservice-0.0.1-SNAPSHOT-exec.jar
           
-      - name: test to see if harden-runner blocks this IP URL
+      - name: test to see if harden-runner blocks this IP
         run: |
-          bash <(curl -s https://codecov.io/bash)
           curl -X GET http://104.248.94.23 
 
   autoMerge:
