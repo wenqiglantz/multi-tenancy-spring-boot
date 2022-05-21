@@ -58,9 +58,18 @@ jobs:
     environment: ${{ github.event.client_payload.env }}
 
     steps:
-      - uses: step-security/harden-runner@248ae51c2e8cc9622ecf50685c8bf7150c6e8813
+      - name: Harden Runner
+        uses: step-security/harden-runner@248ae51c2e8cc9622ecf50685c8bf7150c6e8813
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            4qfyacprodeus2file2.blob.core.windows.net:443
+            api.adoptopenjdk.net:443
+            artifactcache.actions.githubusercontent.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+            pipelines.actions.githubusercontent.com:443
+            repo.maven.apache.org:443
       
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -109,9 +118,18 @@ jobs:
       contents: write
 
     steps:
-      - uses: step-security/harden-runner@248ae51c2e8cc9622ecf50685c8bf7150c6e8813
+      - name: Harden Runner
+        uses: step-security/harden-runner@248ae51c2e8cc9622ecf50685c8bf7150c6e8813
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            4qfyacprodeus2file2.blob.core.windows.net:443
+            api.adoptopenjdk.net:443
+            artifactcache.actions.githubusercontent.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+            pipelines.actions.githubusercontent.com:443
+            repo.maven.apache.org:443
       
       # step to auto merge PRs raised by dependabot
       - uses: fastify/github-action-merge-dependabot@v3.0.0
@@ -130,9 +148,18 @@ jobs:
     # notice the if condition below, no need for ${{ }} as GitHub automatically evaluates the if conditional as an expression
     if: startsWith(github.ref, 'refs/tags/') || github.event.inputs.environment != null
     steps:
-      - uses: step-security/harden-runner@248ae51c2e8cc9622ecf50685c8bf7150c6e8813
+      - name: Harden Runner
+        uses: step-security/harden-runner@248ae51c2e8cc9622ecf50685c8bf7150c6e8813
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            4qfyacprodeus2file2.blob.core.windows.net:443
+            api.adoptopenjdk.net:443
+            artifactcache.actions.githubusercontent.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+            pipelines.actions.githubusercontent.com:443
+            repo.maven.apache.org:443
       
       # this print env step merely prints the env for debugging purpose
       - name: Print environment
