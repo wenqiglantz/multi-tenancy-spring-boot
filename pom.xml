@@ -21,7 +21,7 @@
         <java.version>17</java.version>
         <spring-cloud.version>2021.0.0</spring-cloud.version>
         <spring-boot-starter-validation.version>2.5.3</spring-boot-starter-validation.version>
-        <springdoc-openapi.version>1.6.5</springdoc-openapi.version>
+        <springdoc-openapi.version>1.6.10</springdoc-openapi.version>
         <lombok.version>1.18.22</lombok.version>
         <commons-codec.version>1.15</commons-codec.version>
         <cucumber.version>6.11.0</cucumber.version>
