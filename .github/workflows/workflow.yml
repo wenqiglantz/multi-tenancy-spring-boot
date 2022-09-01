@@ -72,7 +72,7 @@ jobs:
             repo.maven.apache.org:443
       
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
       # Merely to print out the jira issue number and the env variables passed in from the webhook for verification
       - name: Print JIRA ticket number and environment
@@ -85,7 +85,7 @@ jobs:
       # - configure runner for publisher using maven
       # - caching dependencies managed by maven
       - name: Setup jdk-17
-        uses: actions/setup-java@main
+        uses: actions/setup-java@5b36705a13905facb447b6812d613a06a07e371d
         with:
           java-version: 17
           distribution: 'adopt'
@@ -100,7 +100,7 @@ jobs:
       # GitHub Actions Artifacts allow us to persist data after a job has completed, and share that data with another job in the same workflow.
       # So we upload the artifact here so it can be reused by the deploy job later on
       - name: Upload the build output
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2
         with:
           name: exec-jar
           # this path and file name is app specific, be sure to modify if your app differs
@@ -136,7 +136,7 @@ jobs:
             repo.maven.apache.org:443
       
       # step to auto merge PRs raised by dependabot
-      - uses: fastify/github-action-merge-dependabot@v3.0.0
+      - uses: fastify/github-action-merge-dependabot@35d92790eac1b82eb5b6f4a0b48fedced08edb63
         if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
         with:
           # it is an automatically generated secret that lets you make authenticated calls to the GitHub APIs.
@@ -171,14 +171,14 @@ jobs:
           echo environment is ${{ github.event.inputs.environment }}
 
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
       - name: Set tag
         id: vars
         run: echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -186,10 +186,10 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@9149ade017c57f86dea2f76a01f8b2d5bd06b10f
 
       - name: Download the build output
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@f023be2c48cc18debc3bacd34cb396e0295e2869
         with:
           name: exec-jar
           path: rest-controller/target # this value may vary depending on your application
@@ -212,7 +212,7 @@ jobs:
 
       - name: Fill in the new image ID and pass in the environment variable in the ECS task definition
         id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        uses: aws-actions/amazon-ecs-render-task-definition@374ee96751fffe528c09b5f427848da60469bb55
         with:
           task-definition: task-definition.json
           container-name: ${{ secrets.CONTAINER_NAME }}
@@ -221,7 +221,7 @@ jobs:
             ENVIRONMENT=${{ github.event.inputs.environment || 'dev' }}
 
       - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@9c18d81893224634ac107b91720119c91c1d600e
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ secrets.ECS_SERVICE }}
@@ -230,7 +230,7 @@ jobs:
 
       - name: Create commit comment
         if: github.event_name == 'repository_dispatch'
-        uses: peter-evans/commit-comment@v1
+        uses: peter-evans/commit-comment@024efe46f6e45f651301d75870c4bd8fbe17cbc8
         with:
           body: |
             ${{ github.event.client_payload.jira-issue }} has been deployed in ${{ github.event.client_payload.env }}
