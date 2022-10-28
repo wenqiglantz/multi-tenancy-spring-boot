@@ -1,6 +1,5 @@
 # Customer Service
 
-
 #### Customer Service, provides APIs for customer CRUD service, with multi-tenancy support, implemented with Spring Boot, Liquibase, and PostgreSQL.  For detailed article on how this microservice is implemented with multi-tenancy support, please check out my Medium story, https://betterprogramming.pub/multi-tenancy-support-with-spring-boot-liquibase-and-postgresql-d41942dc0639.
 
 * **A. Prerequisites**
